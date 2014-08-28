@@ -1,3 +1,9 @@
+/******************************************************************************
+ * JAlarm
+ * @author  : Christophe De Troyer
+ * Last edit: 28-aug-2014 19:40:38                                                   
+ * Full source can be found on GitHub                                      
+ ******************************************************************************/
 package utils;
 
 public class Printer
