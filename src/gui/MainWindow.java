@@ -25,24 +25,43 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import mp3.Mp3PlayerThread;
+
 import org.joda.time.DateTime;
+import org.joda.time.Seconds;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import utils.Printer;
 
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class MainWindow
 {
-	private static final String DEFAULT_STATUS_STRING = "No alarm set";
+	private static final String DEFAULT_STATUS_STRING   = "No alarm set";
 	private static final String DEFAULT_SONG_LABEL_TEXT = "No song selected";
 	
-	private File selectedSong;
+	private static File                     selectedSong;
+	private static Mp3PlayerThread          playerThread;
+	private static ScheduledExecutorService scheduler;
+	private static int alarmHours;
+	private static int alarmMinutes;
+	
+	
 	public static void main(String[] args)
 	{
 		// ---- TIME PICKING PANEL -------------------------------------------//
@@ -56,6 +75,7 @@ public class MainWindow
 				1);// step
 		JSpinner hoursSpinner = new JSpinner(hoursSpinnerModel);
 		hoursSpinner.setValue(now.getHourOfDay());
+		alarmHours = now.getHourOfDay();
 		((JSpinner.NumberEditor) hoursSpinner.getEditor()).getTextField()
 				.setFont(new Font("DroidSansMono", Font.BOLD, 30));
 		// Seperator (:).
@@ -70,6 +90,7 @@ public class MainWindow
 				1);// step
 		JSpinner minutesSpinner = new JSpinner(minutesSpinnerModel);
 		minutesSpinner.setValue(now.getMinuteOfHour());
+		alarmMinutes = now.getMinuteOfHour();
 		((JSpinner.NumberEditor) minutesSpinner.getEditor()).getTextField()
 				.setFont(new Font("DroidSansMono", Font.BOLD, 30));
 		
@@ -86,6 +107,100 @@ public class MainWindow
 		// Button to browse for a file.
 		JButton btnSelectSong = new JButton();
 		btnSelectSong.setText("Browse..");
+
+		// ---- SET ALARM SECTION --------------------------------------------//
+		JButton btnSetAlarm = new JButton();
+		btnSetAlarm.setText("Set");
+		btnSetAlarm.setFont(new Font("DroidSansMono", Font.BOLD, 30));
+		
+
+		
+		// ---- STATUS BAR ---------------------------------------------------//
+		JPanel statusPanel = new JPanel();
+		statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
+		statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
+		final JLabel statusLabel = new JLabel(DEFAULT_STATUS_STRING);
+		statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
+		statusPanel.add(statusLabel);
+		
+		// ---- ACTION LISTENERS ---------------------------------------------//
+		hoursSpinner.addChangeListener(new ChangeListener()
+		{
+			
+			@Override
+			public void stateChanged(ChangeEvent e)
+			{
+				MainWindow.alarmHours = (int) ((JSpinner) e.getSource()).getValue();
+			}
+		});
+		minutesSpinner.addChangeListener(new ChangeListener()
+		{
+			
+			@Override
+			public void stateChanged(ChangeEvent e)
+			{
+				MainWindow.alarmMinutes = (int) ((JSpinner) e.getSource()).getValue();
+			}
+		});
+		btnSetAlarm.addActionListener(new ActionListener()
+		{
+			
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				if (MainWindow.selectedSong == null)
+				{
+					Printer.debugMessage(this.getClass(), "No song selected");
+				} else
+				{
+					Printer.debugMessage(this.getClass(), "Selected: "
+							+ MainWindow.selectedSong.getAbsolutePath());
+					FileInputStream fis;
+					try
+					{
+						// Prepare the player thread.
+						fis = new FileInputStream(
+								MainWindow.selectedSong.getAbsolutePath());
+						BufferedInputStream bis = new BufferedInputStream(fis);
+						playerThread = new Mp3PlayerThread(bis);
+						
+						// Calculate seconds to alarm.
+						DateTime now          = new DateTime();
+						int      alarmHour    = MainWindow.alarmHours;
+						int      alarmMinutes = MainWindow.alarmMinutes;
+						int currentHour = now.getHourOfDay();
+						int currentMinutes = now.getMinuteOfHour();
+						DateTime alarmDateTime;
+						
+						// Check if alarm is for tomorrow or today.
+						if(alarmHour < currentHour || (alarmHour == currentHour && alarmMinutes < currentMinutes))
+							alarmDateTime = new DateTime().plusDays(1);
+						else
+							alarmDateTime = new DateTime();
+						
+						DateTimeFormatter dtfOut = DateTimeFormat.forPattern("MM/dd/yyyy");
+						String dateString = dtfOut.print(alarmDateTime);
+						
+						DateTimeFormatter formatter = DateTimeFormat.forPattern("MM/dd/yyy HH:mm");
+						alarmDateTime = formatter.parseDateTime(String.format("%s %02d:%02d", dateString, alarmHour, alarmMinutes));
+						Printer.debugMessage(this.getClass(), "alarm set at " + alarmDateTime);
+						
+						statusLabel.setText("Alarm set at: " + formatter.print(alarmDateTime));
+						
+						Seconds seconds = Seconds.secondsBetween(now, alarmDateTime);
+						Printer.debugMessage(this.getClass(), String.format("alarm set in %d seconds", seconds.getSeconds()));
+						// Schedule the task to execute at set date.
+						scheduler = Executors.newScheduledThreadPool(2);
+						scheduler.schedule(playerThread, seconds.getSeconds(), TimeUnit.SECONDS);
+					} catch (FileNotFoundException e1)
+					{
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+		
 		btnSelectSong.addActionListener(new ActionListener()
 		{
 			@Override
@@ -97,25 +212,14 @@ public class MainWindow
 				{
 					// Save the selected file.
 					File selectedFile = fileChooser.getSelectedFile();
+					MainWindow.selectedSong = selectedFile;
+					
 					// Update the label.
 					lblSelectedSong.setText(selectedFile.getName());
 					Printer.debugMessage(this.getClass(), String.format("selected %s\n", selectedFile.getAbsoluteFile()));
 				}
 			}
 		});
-		// ---- SET ALARM SECTION --------------------------------------------//
-		JButton btnSetAlarm = new JButton();
-		btnSetAlarm.setText("Set");
-		btnSetAlarm.setFont(new Font("DroidSansMono", Font.BOLD, 30));
-		
-		// ---- STATUS BAR ---------------------------------------------------//
-		JPanel statusPanel = new JPanel();
-		statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
-		statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
-		JLabel statusLabel = new JLabel(DEFAULT_STATUS_STRING);
-		statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
-		statusPanel.add(statusLabel);
-		
 		// ---- MAIN JPANEL --------------------------------------------------//
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new GridBagLayout());

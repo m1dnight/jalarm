@@ -7,6 +7,7 @@
 package mp3;
 
 import java.io.BufferedInputStream;
+
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
 import utils.Printer;
@@ -27,6 +28,7 @@ public class Mp3PlayerThread implements Runnable
 	@Override
 	public void run()
 	{
+		Printer.debugMessage(this.getClass(), "started run method");
 		synchronized (this)
 		{
 			try
