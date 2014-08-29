@@ -77,10 +77,10 @@ public class MainWindow
 		hoursSpinner.setValue(now.getHourOfDay());
 		alarmHours = now.getHourOfDay();
 		((JSpinner.NumberEditor) hoursSpinner.getEditor()).getTextField()
-				.setFont(new Font("DroidSansMono", Font.BOLD, 30));
+				.setFont(new Font("DroidSansMono", Font.PLAIN, 30));
 		// Seperator (:).
 		JLabel seperator = new JLabel(":");
-		seperator.setFont(new Font("DroidSansMono", Font.BOLD, 30));
+		seperator.setFont(new Font("DroidSansMono", Font.PLAIN, 30));
 		
 		// Minute picker.
 		SpinnerModel minutesSpinnerModel = new SpinnerNumberModel(
@@ -92,7 +92,7 @@ public class MainWindow
 		minutesSpinner.setValue(now.getMinuteOfHour());
 		alarmMinutes = now.getMinuteOfHour();
 		((JSpinner.NumberEditor) minutesSpinner.getEditor()).getTextField()
-				.setFont(new Font("DroidSansMono", Font.BOLD, 30));
+				.setFont(new Font("DroidSansMono", Font.PLAIN, 30));
 		
 		// ---- SONG SELECTION -----------------------------------------------//
 		// Label for the filename.
@@ -111,7 +111,7 @@ public class MainWindow
 		// ---- SET ALARM SECTION --------------------------------------------//
 		JButton btnSetAlarm = new JButton();
 		btnSetAlarm.setText("Set");
-		btnSetAlarm.setFont(new Font("DroidSansMono", Font.BOLD, 30));
+		btnSetAlarm.setFont(new Font("DroidSansMono", Font.PLAIN, 30));
 		
 
 		
@@ -148,6 +148,13 @@ public class MainWindow
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
+				// If we have task scheduled cancel it.
+				if(scheduler != null)
+				{	
+					playerThread.abortThread();
+					scheduler.shutdownNow();
+				}
+				
 				if (MainWindow.selectedSong == null)
 				{
 					Printer.debugMessage(this.getClass(), "No song selected");
@@ -178,6 +185,8 @@ public class MainWindow
 						else
 							alarmDateTime = new DateTime();
 						
+						//TODO can I do this cleaner? 
+						// Create alarm DateTime object.
 						DateTimeFormatter dtfOut = DateTimeFormat.forPattern("MM/dd/yyyy");
 						String dateString = dtfOut.print(alarmDateTime);
 						
@@ -185,8 +194,10 @@ public class MainWindow
 						alarmDateTime = formatter.parseDateTime(String.format("%s %02d:%02d", dateString, alarmHour, alarmMinutes));
 						Printer.debugMessage(this.getClass(), "alarm set at " + alarmDateTime);
 						
+						// Update GUI label.
 						statusLabel.setText("Alarm set at: " + formatter.print(alarmDateTime));
 						
+						// Schedule runnable.
 						Seconds seconds = Seconds.secondsBetween(now, alarmDateTime);
 						Printer.debugMessage(this.getClass(), String.format("alarm set in %d seconds", seconds.getSeconds()));
 						// Schedule the task to execute at set date.
