@@ -1,6 +1,6 @@
 JAlarm
 ======
-
+![Alt text](screenshot.jpg "Interface under Windows")
 This is a simple alarm clock built in Java. It is merely an exercise to keep busy.
 
 TODO
