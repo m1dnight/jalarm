@@ -1,7 +1,7 @@
 /******************************************************************************
  * JAlarm
  * @author  : Christophe De Troyer
- * Last edit: 28-aug-2014 19:40:38                                                   
+ * Last edit: 30-aug-2014 13:07:36                                                   
  * Full source can be found on GitHub                                      
  ******************************************************************************/
 package utils;
@@ -9,9 +9,9 @@ package utils;
 public class Printer
 {
 
-	private final static boolean messagesEnabled = true;
+	private final static boolean messagesEnabled = false;
 	private final static boolean errorsEnabled   = true;
-	private final static boolean debugEnabled    = true;
+	private final static boolean debugEnabled    = false;
 
 	/**
 	 * Prints a regular message with the classname prepended to it.

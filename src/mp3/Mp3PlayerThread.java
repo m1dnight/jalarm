@@ -1,7 +1,7 @@
 /******************************************************************************
  * JAlarm
  * @author  : Christophe De Troyer
- * Last edit: 28-aug-2014 19:40:38                                                   
+ * Last edit: 30-aug-2014 13:07:36                                                   
  * Full source can be found on GitHub                                      
  ******************************************************************************/
 package mp3;
@@ -85,4 +85,14 @@ public class Mp3PlayerThread implements Runnable
 		Printer.debugMessage(this.getClass(), "stopping");
 		this.abort = true;
 	}
+	
+	/**
+	 * Returns the status of the player.
+	 * @return
+	 */
+	public boolean isPlaying()
+	{
+		return !player.isComplete();
+	}
+
 }
