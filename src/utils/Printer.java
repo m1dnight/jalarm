@@ -9,9 +9,9 @@ package utils;
 public class Printer
 {
 
-	private final static boolean messagesEnabled = false;
+	private final static boolean messagesEnabled = true;
 	private final static boolean errorsEnabled   = true;
-	private final static boolean debugEnabled    = false;
+	private final static boolean debugEnabled    = true;
 
 	/**
 	 * Prints a regular message with the classname prepended to it.
