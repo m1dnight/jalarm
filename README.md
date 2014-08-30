@@ -25,3 +25,4 @@ TODO
 3. Remember previous songs
 4. Pick random song out of list of songs
 5. Listen to regular keypress instead of enter.
+6. Implement repeat.
