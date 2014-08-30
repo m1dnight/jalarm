@@ -1,7 +1,6 @@
 JAlarm
 ======
-![Alt text](screenshot.jpg?raw=true "Screenshot under Windows")
-
+<img align="center" src="https://raw.githubusercontent.com/m1dnight/JAlarm/master/screenshot.jpg" alt="Screenshot under Windows">
 
 This is a simple alarm clock built in Java. It is merely an exercise to keep busy.
 
