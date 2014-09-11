@@ -5,11 +5,8 @@
  * Full source can be found on GitHub      :
  * https://github.com/m1dnight/JAlarm                                
  ******************************************************************************/
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.Executors;
@@ -120,29 +117,19 @@ public class Main
 
 	private static void scheduleAlarm(DateTime alarmTime)
 	{
-		try
-		{
-			// Init playerthread
-			FileInputStream fis;
-			fis = new FileInputStream(selectedSong.getAbsolutePath());
-			BufferedInputStream bis = new BufferedInputStream(fis);
-			playerThread = new Mp3PlayerThread(bis);
+		// Init playerthread
+		playerThread = new Mp3PlayerThread(selectedSong.getAbsolutePath(), true);
 
-			// Schedule runnable.
-			Seconds seconds = Seconds.secondsBetween(new DateTime(), alarmTime);
-			Printer.debugMessage(
-					Main.class.getClass(),
-					String.format("alarm set in %d seconds",
-							seconds.getSeconds()));
-			// Schedule the task to execute at set date.
-			scheduler = Executors.newScheduledThreadPool(2);
-			scheduler.schedule(playerThread, seconds.getSeconds(),
-					TimeUnit.SECONDS);
-		} catch (FileNotFoundException e)
-		{
-			System.err.println("Invalid music file specified.");
-			System.exit(1);
-		}
+		// Schedule runnable.
+		Seconds seconds = Seconds.secondsBetween(new DateTime(), alarmTime);
+		Printer.debugMessage(
+				Main.class.getClass(),
+				String.format("alarm set in %d seconds",
+						seconds.getSeconds()));
+		// Schedule the task to execute at set date.
+		scheduler = Executors.newScheduledThreadPool(2);
+		scheduler.schedule(playerThread, seconds.getSeconds(),
+				TimeUnit.SECONDS);
 
 	}
 

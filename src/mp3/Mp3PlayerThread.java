@@ -10,6 +10,9 @@ package mp3;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 import javax.swing.Timer;
 
@@ -23,15 +26,37 @@ public class Mp3PlayerThread implements Runnable
 	private volatile boolean abort = false;
 	
 	private Player player;
-	private final BufferedInputStream songStream;
+	private final Boolean doRepeat;
+	private final String songPath;
 	
 	private Timer snoozeTimer;
 
-	public Mp3PlayerThread(BufferedInputStream songStream)
+	public Mp3PlayerThread(String songPath, boolean doRepeat)
 	{
-		this.songStream = songStream;
+		Printer.debugMessage(this.getClass(), "Started with song. Will repeat : " + doRepeat);
+		this.songPath = songPath;
+		this.doRepeat = doRepeat;
 	}
+	private void initPlayer()
+	{
 
+		try
+		{
+			FileInputStream fis = new FileInputStream(new File(this.songPath).getAbsolutePath());
+			BufferedInputStream bis = new BufferedInputStream(fis);
+			this.player = new Player(bis);
+		} catch (FileNotFoundException e)
+		{
+			Printer.error(this.getClass(), "Song not found!");
+			e.printStackTrace();
+		} catch (JavaLayerException e)
+		{
+			Printer.error(this.getClass(), "Error playing Mp3 file!");
+			// TODO Catch this exception in the main thread and show dialog.
+			//http://docs.oracle.com/javase/6/docs/api/java/lang/Thread.html#setUncaughtExceptionHandler%28java.lang.Thread.UncaughtExceptionHandler%29
+			e.printStackTrace();
+		}
+	}
 	@Override
 	public void run()
 	{
@@ -41,17 +66,19 @@ public class Mp3PlayerThread implements Runnable
 			try
 			{
 				// Initialize the player and set the play flag to true.
-				this.player = new Player(songStream);
+				initPlayer();
 				this.playing = true;
 				
-				while (!player.isComplete() && !abort)
+				while ((!player.isComplete() || doRepeat) && !abort)
 				{
 					
 					while (!playing)
 						this.wait();
-					
 					player.play(1);
+					if(player.isComplete() && doRepeat)
+						initPlayer();
 				}
+				this.playing = false;
 				Printer.debugMessage(this.getClass(), "end of file or stopped");
 
 			} catch (JavaLayerException e)
@@ -85,7 +112,7 @@ public class Mp3PlayerThread implements Runnable
 		}
 	}
 	/**
-	 * Makes the run() method finish
+	 * Makes the run() method finish iff we are not waiting (paused).
 	 * and thus stopping the thread properly.
 	 */
 	public void abortThread()

@@ -8,18 +8,16 @@
 
 package mp3;
 
-import java.io.BufferedInputStream;
-
 import utils.Printer;
 
 public class Mp3Player
 {
 	private Mp3PlayerThread playerThread;
-	private BufferedInputStream songStream;
+	private String songPath;
 
-	public Mp3Player(BufferedInputStream songStream)
+	public Mp3Player(String songPath)
 	{
-		this.songStream = songStream;
+		this.songPath = songPath;
 	}
 
 	/**
@@ -28,7 +26,7 @@ public class Mp3Player
 	 */
 	public synchronized void play()
 	{
-		playerThread = new Mp3PlayerThread(songStream);
+		playerThread = new Mp3PlayerThread(songPath, false);
 		new Thread(playerThread).start();
 	}
 

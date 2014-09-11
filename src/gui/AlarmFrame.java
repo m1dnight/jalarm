@@ -89,18 +89,18 @@ public class AlarmFrame extends javax.swing.JFrame
 		this.getRootPane().getActionMap().put("SPACE", spaceAction);
 		
 		
-		buttonGroup1 = new javax.swing.ButtonGroup();
-		jspAlarmTime = new javax.swing.JSpinner();
-		btnBrowseFiles = new javax.swing.JButton();
-		jPanel1 = new javax.swing.JPanel();
-		cbxRepeat = new javax.swing.JCheckBox();
-		cbxSnooze = new javax.swing.JCheckBox();
+		buttonGroup1       = new javax.swing.ButtonGroup();
+		jspAlarmTime       = new javax.swing.JSpinner();
+		btnBrowseFiles     = new javax.swing.JButton();
+		jPanel1            = new javax.swing.JPanel();
+		cbxRepeat          = new javax.swing.JCheckBox();
+		cbxSnooze          = new javax.swing.JCheckBox();
 		ddwnSnoozeInterval = new javax.swing.JComboBox<String>();
-		jLabel2 = new javax.swing.JLabel();
-		lblSongName = new javax.swing.JLabel();
-		lblAlarmStatus = new javax.swing.JLabel();
-		jButton1 = new javax.swing.JButton();
-		fileChooser = new JFileChooser();
+		jLabel2            = new javax.swing.JLabel();
+		lblSongName        = new javax.swing.JLabel();
+		lblAlarmStatus     = new javax.swing.JLabel();
+		jButton1           = new javax.swing.JButton();
+		fileChooser        = new JFileChooser();
 		fileChooser.setDialogTitle("Select song");
 		fileChooser.setAcceptAllFileFilterUsed(false);
 		fileChooser.setFileFilter(new FileNameExtensionFilter("Mp3", "mp3"));
@@ -406,7 +406,7 @@ public class AlarmFrame extends javax.swing.JFrame
 				// Prepare the player thread.
 				FileInputStream fis = new FileInputStream(selectedSong.getAbsolutePath());
 				BufferedInputStream bis = new BufferedInputStream(fis);
-				playerThread = new Mp3PlayerThread(bis);
+				playerThread = new Mp3PlayerThread(selectedSong.getAbsolutePath(), doRepeat);
 
 				// Schedule runnable.
 				Seconds seconds = Seconds.secondsBetween(new DateTime(), alarmTime);
@@ -499,17 +499,17 @@ public class AlarmFrame extends javax.swing.JFrame
 	//---- VARIABLE DECLARATIONS ---------------------------------------------//
 	//------------------------------------------------------------------------//
 	// Variables declaration - do not modify
-	private javax.swing.JButton btnBrowseFiles;
-	private javax.swing.ButtonGroup buttonGroup1;
-	private javax.swing.JCheckBox cbxRepeat;
-	private javax.swing.JCheckBox cbxSnooze;
+	private javax.swing.JButton           btnBrowseFiles;
+	private javax.swing.ButtonGroup       buttonGroup1;
+	private javax.swing.JCheckBox         cbxRepeat;
+	private javax.swing.JCheckBox         cbxSnooze;
 	private javax.swing.JComboBox<String> ddwnSnoozeInterval;
-	private javax.swing.JButton jButton1;
-	private javax.swing.JLabel lblAlarmStatus;
-	private javax.swing.JLabel jLabel2;
-	private javax.swing.JPanel jPanel1;
-	private javax.swing.JSpinner jspAlarmTime;
-	private javax.swing.JLabel lblSongName;
+	private javax.swing.JButton           jButton1;
+	private javax.swing.JLabel            lblAlarmStatus;
+	private javax.swing.JLabel            jLabel2;
+	private javax.swing.JPanel            jPanel1;
+	private javax.swing.JSpinner          jspAlarmTime;
+	private javax.swing.JLabel            lblSongName;
 	
 	private JFileChooser fileChooser;
 	
