@@ -12,7 +12,7 @@ Usage
 
 There is a simple interface which I abandoned due to not being a UX-designer. I have implemented a simple CLI interface which suits my needs better.
 
-Compile the program in an executable .jar file (or download the jar from this repo). Help is available by executing
+Compile the program in an executable .jar file (or download the appropriate jar from this repo). Help is available by executing
 
     java -jar alarm.jar -h
 
