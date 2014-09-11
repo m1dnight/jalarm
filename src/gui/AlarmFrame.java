@@ -10,10 +10,7 @@ package gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -76,6 +73,7 @@ public class AlarmFrame extends javax.swing.JFrame
 		spaceKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false);
 		spaceAction = new AbstractAction()
 		{
+			private static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent e)
 			{
 				if (doSnooze)
@@ -401,29 +399,19 @@ public class AlarmFrame extends javax.swing.JFrame
 		{
 			Printer.debugMessage(this.getClass(), "Selected: "
 					+ selectedSong.getAbsolutePath());
-			try
-			{
-				// Prepare the player thread.
-				FileInputStream fis = new FileInputStream(selectedSong.getAbsolutePath());
-				BufferedInputStream bis = new BufferedInputStream(fis);
-				playerThread = new Mp3PlayerThread(selectedSong.getAbsolutePath(), doRepeat);
+			// Prepare the player thread.
+			playerThread = new Mp3PlayerThread(selectedSong.getAbsolutePath(), doRepeat);
 
-				// Schedule runnable.
-				Seconds seconds = Seconds.secondsBetween(new DateTime(), alarmTime);
-				Printer.debugMessage(this.getClass(), String.format("alarm set in %d seconds", seconds.getSeconds()));
-				// Schedule the task to execute at set date.
-				scheduler = Executors.newScheduledThreadPool(2);
-				scheduler.schedule(playerThread, seconds.getSeconds(), TimeUnit.SECONDS);
-				Printer.debugMessage(this.getClass(), "alarm set at " + alarmTime);
+			// Schedule runnable.
+			Seconds seconds = Seconds.secondsBetween(new DateTime(), alarmTime);
+			Printer.debugMessage(this.getClass(), String.format("alarm set in %d seconds", seconds.getSeconds()));
+			// Schedule the task to execute at set date.
+			scheduler = Executors.newScheduledThreadPool(2);
+			scheduler.schedule(playerThread, seconds.getSeconds(), TimeUnit.SECONDS);
+			Printer.debugMessage(this.getClass(), "alarm set at " + alarmTime);
 
-				// Update the label accordingly.
-				updateStatusLabel();
-				
-			} catch (FileNotFoundException e1)
-			{
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+			// Update the label accordingly.
+			updateStatusLabel();
 		}
 	}
 
