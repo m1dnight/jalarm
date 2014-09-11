@@ -16,7 +16,6 @@ public class Printer
 	private final static boolean messagesEnabled = true;
 	private final static boolean errorsEnabled   = true;
 	private final static boolean debugEnabled    = true;
-	private final static SimpleDateFormat sdf = new SimpleDateFormat("HH:MM a");
 
 	/**
 	 * Prints a regular message with the classname prepended to it.
@@ -25,7 +24,7 @@ public class Printer
 	 */
 	public static void debugMessage(@SuppressWarnings("rawtypes") Class c, String msg)
 	{
-		
+		SimpleDateFormat sdf = new SimpleDateFormat("HH:MM a");
 		if(debugEnabled)
 		{
 			System.out.println(String.format("%s :: %15s : %s", sdf.format(new Date()), c.getSimpleName(), msg));
@@ -40,6 +39,7 @@ public class Printer
 	{
 		if(debugEnabled)
 		{
+			SimpleDateFormat sdf = new SimpleDateFormat("HH:MM a");
 			System.out.println(String.format("%s :: %15s : %s", sdf.format(new Date()), sender, msg));
 		}
 	}
@@ -53,6 +53,7 @@ public class Printer
 	{
 		if (errorsEnabled)
 		{
+			SimpleDateFormat sdf = new SimpleDateFormat("HH:MM a");
 			System.err
 					.println(String.format("%s :: %15s : %s", sdf.format(new Date()), c.getSimpleName(), msg));
 		}
@@ -62,6 +63,7 @@ public class Printer
 	{
 		if (messagesEnabled)
 		{
+			SimpleDateFormat sdf = new SimpleDateFormat("HH:MM a");
 			System.out
 					.println(String.format("%s :: %15s : %s", sdf.format(new Date()), c.getSimpleName(), msg));
 		}

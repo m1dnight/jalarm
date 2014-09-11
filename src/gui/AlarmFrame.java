@@ -87,7 +87,6 @@ public class AlarmFrame extends javax.swing.JFrame
 		this.getRootPane().getActionMap().put("SPACE", spaceAction);
 		
 		
-		buttonGroup1       = new javax.swing.ButtonGroup();
 		jspAlarmTime       = new javax.swing.JSpinner();
 		btnBrowseFiles     = new javax.swing.JButton();
 		jPanel1            = new javax.swing.JPanel();
@@ -488,7 +487,6 @@ public class AlarmFrame extends javax.swing.JFrame
 	//------------------------------------------------------------------------//
 	// Variables declaration - do not modify
 	private javax.swing.JButton           btnBrowseFiles;
-	private javax.swing.ButtonGroup       buttonGroup1;
 	private javax.swing.JCheckBox         cbxRepeat;
 	private javax.swing.JCheckBox         cbxSnooze;
 	private javax.swing.JComboBox<String> ddwnSnoozeInterval;
@@ -511,8 +509,8 @@ public class AlarmFrame extends javax.swing.JFrame
 	private int snoozeIntervalMinutes = -1;
 	private static DateTime alarmTime;
 	
-	private static File selectedSong;
-	private static Mp3PlayerThread playerThread;
-	private static ScheduledExecutorService scheduler;
+	private File selectedSong;
+	private Mp3PlayerThread playerThread;
+	private ScheduledExecutorService scheduler;
 
 }

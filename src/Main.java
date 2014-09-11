@@ -93,12 +93,14 @@ public class Main
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		try
 		{
-			while (!br.readLine().equals("imawakenow"))
+			String input = br.readLine();
+			while (input != null && !input.equals("imawakenow"))
 			{
 				
 				System.out.println("Snoozing");
 				cancelAlarm();
 				scheduleAlarm(new DateTime().plusSeconds(snoozeTime));
+				input = br.readLine();
 			}
 		} catch (IOException e)
 		{
