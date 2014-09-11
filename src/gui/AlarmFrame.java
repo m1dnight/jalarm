@@ -25,6 +25,8 @@ import javax.swing.JSpinner.DateEditor;
 import javax.swing.SpinnerDateModel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import mp3.Mp3PlayerThread;
+
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 import org.joda.time.format.DateTimeFormat;
@@ -32,7 +34,6 @@ import org.joda.time.format.DateTimeFormatter;
 
 import utils.Parser;
 import utils.Printer;
-import mp3.Mp3PlayerThread;
 
 /**
  *
@@ -40,14 +41,7 @@ import mp3.Mp3PlayerThread;
  */
 public class AlarmFrame extends javax.swing.JFrame
 {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-	/**
-	 * Creates new form NewJFrame
-	 */
 	public AlarmFrame()
 	{
 		initComponents();
@@ -462,6 +456,9 @@ public class AlarmFrame extends javax.swing.JFrame
 		});
 	}
 
+	//------------------------------------------------------------------------//
+	//---- VARIABLE DECLARATIONS ---------------------------------------------//
+	//------------------------------------------------------------------------//
 	// Variables declaration - do not modify
 	private javax.swing.JButton btnBrowseFiles;
 	private javax.swing.ButtonGroup buttonGroup1;
