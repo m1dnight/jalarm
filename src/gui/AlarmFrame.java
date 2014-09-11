@@ -1,11 +1,15 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/******************************************************************************
+ * JAlarm
+ * @author  : Christophe De Troyer
+ * Last edit: 11-sep-2014 19:39:13                                                   
+ * Full source can be found on GitHub      :
+ * https://github.com/m1dnight/JAlarm                                
+ ******************************************************************************/
 
 package gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,13 +19,17 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JSpinner;
 import javax.swing.JSpinner.DateEditor;
+import javax.swing.KeyStroke;
 import javax.swing.SpinnerDateModel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -35,6 +43,8 @@ import org.joda.time.format.DateTimeFormatter;
 import utils.Parser;
 import utils.Printer;
 
+
+
 /**
  *
  * @author ChristopheRosaFreddy
@@ -45,13 +55,40 @@ public class AlarmFrame extends javax.swing.JFrame
 	public AlarmFrame()
 	{
 		initComponents();
+		// Set the icon.
 	    ImageIcon programIcon = new ImageIcon(getClass().getClassLoader().getResource("icon.png"));
 	    setIconImage(programIcon.getImage());
+	    
+	    // Set initial alarm time to current time.
+	    Date value = (Date) jspAlarmTime.getValue();
+		DateTime selectedValue = new DateTime(value);
+		
+		int hourOfDay = selectedValue.getHourOfDay();
+		int minutesOfDay = selectedValue.getMinuteOfHour();
+		alarmTime = Parser.parseHourStamp(hourOfDay, minutesOfDay);
+	   
+
 	}
 
 	private void initComponents()
 	{
-
+		// Bind space as the snooze button.
+		spaceKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false);
+		spaceAction = new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if (doSnooze)
+				{
+					Printer.debugMessage("Space action", "Pausing playback");
+					playerThread.snoozeThread(AlarmFrame.this.snoozeIntervalMinutes * 60000);
+				}
+			}
+		};
+		this.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(spaceKeyStroke, "SPACE");
+		this.getRootPane().getActionMap().put("SPACE", spaceAction);
+		
+		
 		buttonGroup1 = new javax.swing.ButtonGroup();
 		jspAlarmTime = new javax.swing.JSpinner();
 		btnBrowseFiles = new javax.swing.JButton();
@@ -100,7 +137,6 @@ public class AlarmFrame extends javax.swing.JFrame
 		});
 
 		jPanel1.setBorder(BorderFactory.createTitledBorder("Settings"));
-
 		cbxRepeat.setText("Repeat");
 		cbxRepeat.addChangeListener(new javax.swing.event.ChangeListener()
 		{
@@ -203,6 +239,7 @@ public class AlarmFrame extends javax.swing.JFrame
 
 		jButton1.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
 		jButton1.setText("Set");
+		jButton1.setFocusable(false);
 		jButton1.addActionListener(new java.awt.event.ActionListener()
 		{
 			@Override
@@ -310,11 +347,11 @@ public class AlarmFrame extends javax.swing.JFrame
 		// New checked state.
 		boolean isChecked = ((JCheckBox) evt.getSource()).isSelected();
 		doSnooze = isChecked;
-		snoozeInterval = Integer.parseInt((String) ddwnSnoozeInterval
+		snoozeIntervalMinutes = Integer.parseInt((String) ddwnSnoozeInterval
 				.getSelectedItem());
 		ddwnSnoozeInterval.setEnabled(isChecked);
 		Printer.debugMessage(this.getClass(), String.format("snooze enabled: " + isChecked));
-		Printer.debugMessage(this.getClass(), String.format("snooze interval %d\n", snoozeInterval));
+		Printer.debugMessage(this.getClass(), String.format("snooze interval %d\n", snoozeIntervalMinutes));
 	}
 
 	private void jspAlarmTimeStateChanged(javax.swing.event.ChangeEvent evt)
@@ -340,9 +377,9 @@ public class AlarmFrame extends javax.swing.JFrame
 	private void ddwnSnoozeIntervalActionPerformed(
 			java.awt.event.ActionEvent evt)
 	{
-		snoozeInterval = Integer.parseInt((String) ddwnSnoozeInterval
+		snoozeIntervalMinutes = Integer.parseInt((String) ddwnSnoozeInterval
 				.getSelectedItem());
-		Printer.debugMessage(this.getClass(), String.format("reapeat is %s\n", snoozeInterval));
+		Printer.debugMessage(this.getClass(), String.format("reapeat is %s\n", snoozeIntervalMinutes));
 	}
 
 	private void jButton1ActionPerformed(java.awt.event.ActionEvent evt)
@@ -350,6 +387,8 @@ public class AlarmFrame extends javax.swing.JFrame
 		// If we have task scheduled cancel it.
 		if(scheduler != null)
 		{	
+			//TODO If we cancel the alarm thread using abortThread() and subsequently call
+			// shutdownNow() the thread throws an interrupted exception. Fix this.
 			playerThread.abortThread();
 			scheduler.shutdownNow();
 		}
@@ -474,11 +513,14 @@ public class AlarmFrame extends javax.swing.JFrame
 	
 	private JFileChooser fileChooser;
 	
+	// Snooze actions.
+	private Action spaceAction;
+	private KeyStroke spaceKeyStroke;
 	
 	// State variables
 	private boolean doSnooze = false;
 	private boolean doRepeat = false;
-	private int snoozeInterval = -1;
+	private int snoozeIntervalMinutes = -1;
 	private static DateTime alarmTime;
 	
 	private static File selectedSong;

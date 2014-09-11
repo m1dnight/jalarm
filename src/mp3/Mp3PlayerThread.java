@@ -1,12 +1,17 @@
 /******************************************************************************
  * JAlarm
  * @author  : Christophe De Troyer
- * Last edit: 30-aug-2014 13:07:36                                                   
- * Full source can be found on GitHub                                      
+ * Last edit: 11-sep-2014 19:39:13                                                   
+ * Full source can be found on GitHub      :
+ * https://github.com/m1dnight/JAlarm                                
  ******************************************************************************/
 package mp3;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
+
+import javax.swing.Timer;
 
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
@@ -19,6 +24,8 @@ public class Mp3PlayerThread implements Runnable
 	
 	private Player player;
 	private final BufferedInputStream songStream;
+	
+	private Timer snoozeTimer;
 
 	public Mp3PlayerThread(BufferedInputStream songStream)
 	{
@@ -39,6 +46,7 @@ public class Mp3PlayerThread implements Runnable
 				
 				while (!player.isComplete() && !abort)
 				{
+					
 					while (!playing)
 						this.wait();
 					
@@ -77,13 +85,19 @@ public class Mp3PlayerThread implements Runnable
 		}
 	}
 	/**
-	 * Sets the abort flag to true. Doing so makes the run() method finish
+	 * Makes the run() method finish
 	 * and thus stopping the thread properly.
 	 */
 	public void abortThread()
 	{
+		// If we have a snooze running we have to cancel that as well.
+		if(snoozeTimer != null) 
+		{
+			snoozeTimer.stop();
+		}
+		
 		Printer.debugMessage(this.getClass(), "stopping");
-		this.abort = true;
+		this.abort = true;	
 	}
 	
 	/**
@@ -93,6 +107,32 @@ public class Mp3PlayerThread implements Runnable
 	public boolean isPlaying()
 	{
 		return !player.isComplete();
+	}
+	
+	/**
+	 * Pauses the thread for snoozeInterval miliseconds
+	 * using snoozeTimer.
+	 * @param snoozeInterval
+	 */
+	public void snoozeThread(int snoozeInterval)
+	{
+		Printer.debugMessage(this.getClass(), "Snoozing playback");
+		this.pauseThread();
+		
+		// Cancel any running snoozes.
+		if(snoozeTimer != null && snoozeTimer.isRunning()) 
+			snoozeTimer.stop();
+		
+		snoozeTimer = new Timer(snoozeInterval, new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				Printer.debugMessage(this.getClass(), "Resuming playback");
+				Mp3PlayerThread.this.resumeThread();
+			}
+		});
+		snoozeTimer.start();
 	}
 
 }

@@ -1,8 +1,9 @@
 /******************************************************************************
  * JAlarm
  * @author  : Christophe De Troyer
- * Last edit: 30-aug-2014 13:07:36                                                   
- * Full source can be found on GitHub                                      
+ * Last edit: 11-sep-2014 19:39:13                                                   
+ * Full source can be found on GitHub      :
+ * https://github.com/m1dnight/JAlarm                                
  ******************************************************************************/
 
 package mp3;

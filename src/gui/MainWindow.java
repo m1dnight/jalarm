@@ -1,10 +1,12 @@
 /******************************************************************************
  * JAlarm
  * @author  : Christophe De Troyer
- * Last edit: 30-aug-2014 13:07:36                                                   
- * Full source can be found on GitHub                                      
+ * Last edit: 11-sep-2014 19:39:13                                                   
+ * Full source can be found on GitHub      :
+ * https://github.com/m1dnight/JAlarm                                
  ******************************************************************************/
 package gui;
+
 
 public class MainWindow
 {
@@ -33,12 +35,17 @@ public class MainWindow
         }
         //</editor-fold>
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
-			public void run() {
-                new AlarmFrame().setVisible(true);
-            }
-        });
+		/* Create and display the form */
+		java.awt.EventQueue.invokeLater(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				final AlarmFrame mainFrame = new AlarmFrame();
+				mainFrame.setVisible(true);
+				
+
+			}
+		});
 	}
 }
